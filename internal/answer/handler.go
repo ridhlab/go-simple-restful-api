@@ -8,11 +8,11 @@ func RegisterRoutes(app *fiber.App, controller *AnswerController) {
 	answerGroup := app.Group("/answer")
 
 	answerGroup.Get("/", func(c *fiber.Ctx) error {
-		return controller.GetAllAnswer(c)
+		return controller.GetAnswers(c)
 	})
 
 	answerGroup.Get("/:id", func(c *fiber.Ctx) error {
-		return controller.GetAnswerByID(c)
+		return controller.GetAnswerById(c)
 	})
 
 	answerGroup.Post("/", func(c *fiber.Ctx) error {

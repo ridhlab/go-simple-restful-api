@@ -12,7 +12,7 @@ func RegisterRoutes(app *fiber.App, controller *UserController) {
 	})
 
 	userGroup.Get("/:id", func(c *fiber.Ctx) error {
-		return controller.GetUserByID(c)
+		return controller.GetUserById(c)
 	})
 
 	userGroup.Post("/", func(c *fiber.Ctx) error {

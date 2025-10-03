@@ -14,19 +14,21 @@ import (
 func (s *Server) RegisterRoutes() {
 	fmt.Println("Registering routes...")
 	s.App.Get("/", func(c *fiber.Ctx) error {
-
 		return c.Status(http.StatusOK).SendString("Welcome to the Go Simple RESTful API!")
 	})
 
-	userUseCase := user.NewUserUseCase(s.db)
+	userRepo := user.NewUserRepository(s.db)
+	userUseCase := user.NewUserUseCase(userRepo)
 	userController := user.NewUserController(userUseCase)
 	user.RegisterRoutes(s.App, userController)
 
-	answerUseCase := answer.NewAnswerUseCase(s.db)
+	answerRepo := answer.NewAnswerRepository(s.db)
+	answerUseCase := answer.NewAnswerUseCase(answerRepo, userRepo)
 	answerController := answer.NewAnswerController(answerUseCase)
 	answer.RegisterRoutes(s.App, answerController)
 
-	questionUseCase := question.NewQuestionUseCase(s.db)
+	questionRepo := question.NewQuestionRepository(s.db)
+	questionUseCase := question.NewQuestionUseCase(questionRepo, userRepo)
 	questionController := question.NewQuestionController(questionUseCase)
 	question.RegisterRoutes(s.App, questionController)
 }
