@@ -36,7 +36,7 @@ func (r *AnswerRepository) CreateAnswer(answer *models.Answer) error {
 }
 
 func (r *AnswerRepository) GetAnswerById(id int) (*models.Answer, error) {
-	query := "SELECT id, question_id, author_id, content, created_at FROM answers WHERE id = $1"
+	query := "SELECT answer_id, question_id, author_id, content, created_at FROM answers WHERE answer_id = $1"
 	row := r.db.QueryRow(query, id)
 	var answer models.Answer
 	err := row.Scan(&answer.AnswerId, &answer.QuestionId, &answer.AuthorId, &answer.Content, &answer.CreatedAt)
@@ -47,7 +47,7 @@ func (r *AnswerRepository) GetAnswerById(id int) (*models.Answer, error) {
 }
 
 func (r *AnswerRepository) GetAnswerByUserId(id int) ([]*models.Answer, error) {
-	query := "SELECT id, question_id, author_id, content, created_at FROM answers WHERE author_id = $1"
+	query := "SELECT answer_id, question_id, author_id, content, created_at FROM answers WHERE author_id = $1"
 	rows, err := r.db.Query(query, id)
 	if err != nil {
 		return nil, err
@@ -66,7 +66,7 @@ func (r *AnswerRepository) GetAnswerByUserId(id int) ([]*models.Answer, error) {
 }
 
 func (r *AnswerRepository) UpdateAnswer(answer *models.Answer) error {
-	query := "UPDATE answers SET question_id = $1, author_id = $2, content = $3 WHERE id = $4"
+	query := "UPDATE answers SET question_id = $1, author_id = $2, content = $3 WHERE answer_id = $4"
 	_, err := r.db.Exec(query, answer.QuestionId, answer.AuthorId, answer.Content, answer.AnswerId)
 	if err != nil {
 		return err
@@ -75,7 +75,7 @@ func (r *AnswerRepository) UpdateAnswer(answer *models.Answer) error {
 }
 
 func (r *AnswerRepository) DeleteAnswer(id int) error {
-	query := "DELETE FROM answers WHERE id = $1"
+	query := "DELETE FROM answers WHERE answer_id = $1"
 	_, err := r.db.Exec(query, id)
 	if err != nil {
 		return err
@@ -84,7 +84,7 @@ func (r *AnswerRepository) DeleteAnswer(id int) error {
 }
 
 func (r *AnswerRepository) GetAnswerByQuestionId(id int) ([]*models.Answer, error) {
-	query := "SELECT id, question_id, author_id, content, created_at FROM answers WHERE question_id = $1"
+	query := "SELECT answer_id, question_id, author_id, content, created_at FROM answers WHERE question_id = $1"
 	rows, err := r.db.Query(query, id)
 	if err != nil {
 		return nil, err

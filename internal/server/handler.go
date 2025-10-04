@@ -29,6 +29,6 @@ func (s *Server) RegisterRoutes() {
 
 	questionRepo := question.NewQuestionRepository(s.db)
 	questionUseCase := question.NewQuestionUseCase(questionRepo, userRepo)
-	questionController := question.NewQuestionController(questionUseCase)
+	questionController := question.NewQuestionController(questionUseCase, answerUseCase)
 	question.RegisterRoutes(s.App, questionController)
 }

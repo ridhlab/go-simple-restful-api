@@ -1,20 +1,24 @@
 package question
 
 import (
+	"github/com/ridhlab/go-simple-restful-api/internal/answer"
 	"github/com/ridhlab/go-simple-restful-api/models"
 	"log"
 	"strconv"
+	"sync"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type QuestionController struct {
-	useCase *QuestionUseCase
+	useCase       *QuestionUseCase
+	answerUseCase *answer.AnswerUseCase
 }
 
-func NewQuestionController(useCase *QuestionUseCase) *QuestionController {
+func NewQuestionController(useCase *QuestionUseCase, answerUseCase *answer.AnswerUseCase) *QuestionController {
 	return &QuestionController{
-		useCase: useCase,
+		useCase:       useCase,
+		answerUseCase: answerUseCase,
 	}
 }
 
@@ -72,15 +76,46 @@ func (c *QuestionController) GetQuestionById(ctx *fiber.Ctx) error {
 			"error": "Cannot parse question ID",
 		})
 	}
-	question, err := c.useCase.GetQuestionById(id)
-	if err != nil {
-		log.Printf("Error getting question by ID: %v", err)
+
+	var question *models.Question
+	var answers []*models.Answer
+
+	var qErr, aErr error
+
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+		question, qErr = c.useCase.GetQuestionById(id)
+	}()
+
+	go func() {
+		defer wg.Done()
+		answers, aErr = c.answerUseCase.GetAnswerByQuestionId(id)
+	}()
+
+	wg.Wait()
+	if qErr != nil {
+		log.Printf("Error getting question by ID: %v", qErr)
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Cannot get question by ID",
 		})
 	}
+	if aErr != nil {
+		log.Printf("Error getting answers by question ID: %v", aErr)
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Cannot get answers by question ID",
+		})
+	}
+
+	dataResult := &GetQuestionDetailResponse{
+		Question: *question,
+		Answers:  answers,
+	}
+
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
-		"question": question,
+		"question": dataResult,
 		"message":  "Get question by ID successfully",
 	})
 }
