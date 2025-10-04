@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github/com/ridhlab/go-simple-restful-api/internal/user"
 	"github/com/ridhlab/go-simple-restful-api/models"
+	"log"
 )
 
 type IAnswerUseCase interface {
@@ -30,6 +31,7 @@ func NewAnswerUseCase(repo IAnswerRepository, userRepo user.IUserRepository) *An
 func (uc *AnswerUseCase) CreateAnswer(createAnswerReq *CreateAnswerRequest) error {
 	_, err := uc.userRepo.GetUserById(createAnswerReq.AuthorId)
 	if err != nil {
+		log.Printf("Error getting user: %v", err)
 		return errors.New("user not found")
 	}
 	answer := &models.Answer{
@@ -39,6 +41,7 @@ func (uc *AnswerUseCase) CreateAnswer(createAnswerReq *CreateAnswerRequest) erro
 	}
 	err = uc.repo.CreateAnswer(answer)
 	if err != nil {
+		log.Printf("Error creating answer: %v", err)
 		return err
 	}
 	return nil
